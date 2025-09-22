@@ -229,7 +229,8 @@ def generate_salary(request, employee_id, year, month):
         )
 
         # Generate PDF entirely in memory
-        logo_path = r"C:\Users\ummara.khan\Music\lib-system\labor-management (1)\images\2ec7ca9c-da9f-44f9-94cd-d93012fa7c21.jfif"
+        logo_path = os.path.join(settings.BASE_DIR, 'media', 'logo.jpg')
+
         pdf_content = generate_salary_pdf(salary_record, logo_path=logo_path)
 
         # Serve PDF immediately
