@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}PDF Preview - {{ salary_record.employee.full_name }} - Labor Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-file-pdf me-2"></i>Salary Slip Preview</h1>
+    <div class="btn-group">
+        <a href="{% url 'salary:pdf' salary_record.pk %}" class="btn btn-success">
+            <i class="fas fa-download me-2"></i>Download PDF
+        </a>
+        <a href="{% url 'salary:list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<!-- PDF Preview Card -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-eye me-2"></i>Salary Slip Preview - {{ salary_record.employee.full_name }}
+    </div>
+    <div class="card-body">
+        <!-- Salary Slip Preview -->
+        <div class="salary-slip-preview p-4" style="background: white; border: 2px solid #ddd; font-family: 'Courier New', monospace;">
+            
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 style="color: #2c3e50; margin-bottom: 10px;">SALARY SLIP</h2>
+                <h3 style="color: #2c3e50;">
+                    {% with month_name=salary_record.month|date:"F" %}
+                        {{ month_name }} {{ salary_record.year }}
+                    {% endwith %}
+                </h3>
+                <p style="margin: 5px 0;">Labor Management System</p>
+                <hr style="border: 1px solid #2c3e50;">
+            </div>
+            
+            <!-- Employee Information -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                        Employee Information / معلومات ملازم
+                    </h5>
+                    <p><strong>Name / نام:</strong> {{ salary_record.employee.full_name }}</p>
+                    <p><strong>Employee ID / ملازم نمبر:</strong> #{{ salary_record.employee.id }}</p>
+                    <p><strong>Type / قسم:</strong> {{ salary_record.employee.get_employee_type_display }}</p>
+                    <p><strong>Age / عمر:</strong> {{ salary_record.employee.age }} years</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                        Attendance Summary / حاضری کا خلاصہ
+                    </h5>
+                    <p><strong>Present Days / حاضر دن:</strong> {{ salary_record.days_present }}</p>
+                    <p><strong>Absent Days / غیر حاضر دن:</strong> {{ salary_record.days_absent }}</p>
+                    <p><strong>Overtime Hours / اضافی گھنٹے:</strong> {{ salary_record.overtime_hours }} hours</p>
+                    <p><strong>Joining Date / ملازمت کی تاریخ:</strong> {{ salary_record.employee.joining_date|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+            
+            <!-- Salary Breakdown -->
+            <div class="mb-4">
+                <h5 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                    Salary Breakdown / تنخواہ کی تفصیل
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered" style="font-family: 'Courier New', monospace;">
+                        <tbody>
+                            <tr>
+                                <td><strong>Basic Salary / بنیادی تنخواہ:</strong></td>
+                                <td class="text-end"><strong>Rs. {{ salary_record.basic_salary|floatformat:0 }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Overtime Amount / اضافی رقم:</strong></td>
+                                <td class="text-end"><strong>Rs. {{ salary_record.overtime_amount|floatformat:0 }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tea Allowance / چائے الاؤنس:</strong></td>
+                                <td class="text-end"><strong>Rs. {{ salary_record.tea_allowance|floatformat:0 }}</strong></td>
+                            </tr>
+                            <tr style="color: red;">
+                                <td><strong>Deductions / کٹوتیاں:</strong></td>
+                                <td class="text-end"><strong>Rs. {{ salary_record.deductions|floatformat:0 }}</strong></td>
+                            </tr>
+                            <tr style="color: blue;">
+                                <td><strong>Dues / بقایا:</strong></td>
+                                <td class="text-end"><strong>Rs. {{ salary_record.dues|floatformat:0 }}</strong></td>
+                            </tr>
+                            <tr style="background-color: #d4edda; font-size: 1.2em;">
+                                <td><strong>TOTAL SALARY / کل تنخواہ:</strong></td>
+                                <td class="text-end"><strong>Rs. {{ salary_record.total_salary|floatformat:0 }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Calculation Details -->
+            <div class="mb-4">
+                <h5 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                    Calculation Details / حساب کتاب کی تفصیل
+                </h5>
+                <p><strong>اضافی وقت کا حساب / Overtime Calculation:</strong> {{ salary_record.overtime_hours }} گھنٹے × 1.5 = Rs. {{ salary_record.overtime_amount|floatformat:0 }}</p>
+                <p><strong>غیر حاضری کی کٹوتی / Absence Deduction:</strong> {{ salary_record.days_absent }} دن × Daily Rate = Rs. {{ salary_record.deductions|floatformat:0 }}</p>
+                <p><strong>چائے الاؤنس / Tea Allowance:</strong> ماہانہ مقررہ رقم = Rs. {{ salary_record.tea_allowance|floatformat:0 }}</p>
+            </div>
+            
+            <!-- Notes -->
+            {% if salary_record.notes %}
+            <div class="mb-4">
+                <h5 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                    Notes / نوٹس
+                </h5>
+                <p>{{ salary_record.notes }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Footer -->
+            <div class="text-center mt-4" style="border-top: 1px solid #ddd; padding-top: 15px;">
+                <p style="font-size: 0.9em; color: #666;">
+                    Generated on: {{ "now"|date:"d/m/Y H:i" }}<br>
+                    Labor Management System
+                </p>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="text-center mt-4">
+            <a href="{% url 'salary:pdf' salary_record.pk %}" class="btn btn-success btn-lg">
+                <i class="fas fa-download me-2"></i>Download PDF
+            </a>
+            <a href="{% url 'salary:edit' salary_record.pk %}" class="btn btn-primary btn-lg ms-2">
+                <i class="fas fa-edit me-2"></i>Edit Salary
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Print functionality
+function printSalarySlip() {
+    var printContent = document.querySelector('.salary-slip-preview').innerHTML;
+    var originalContent = document.body.innerHTML;
+    
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+    location.reload();
+}
+</script>
+{% endblock %}
